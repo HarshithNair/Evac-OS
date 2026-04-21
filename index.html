@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVAC-OS Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Firebase Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body class="light-mode">
+    <div id="app" class="dashboard-container">
+        
+        <!-- Sensor Alert Banner -->
+        <div id="sensor-alert-container" class="sensor-alert-container hidden">
+            <div class="sensor-alert-content">
+                <i class="fa-solid fa-satellite-dish warning-pulse"></i>
+                <div class="sensor-alert-text">
+                    <h4 id="sensor-alert-title">AUTOMATIC HAZARD SENSE DETECTED</h4>
+                    <p id="sensor-alert-desc">Thermal anomaly detected. Awaiting verification.</p>
+                </div>
+            </div>
+            <div class="sensor-alert-actions">
+                <button id="btn-reject-sensor" class="btn" style="background:transparent; border: 1px solid rgba(255,255,255,0.5); color: #fff;">Reject (False Alarm)</button>
+                <button id="btn-approve-sensor" class="btn btn-danger">Approve & Publish</button>
+            </div>
+        </div>
+
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <i class="fa-solid fa-shield-halved logo-icon"></i>
+                <h1>EVAC-OS</h1>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <i class="fa-solid fa-house"></i> Main Dashboard
+                </button>
+                <button class="nav-item" data-tab="responder">
+                    <i class="fa-solid fa-truck-medical"></i> First Responder View
+                </button>
+            </nav>
+            <div class="sidebar-bottom">
+                <button id="toggle-blackout" class="btn btn-warning">
+                    <i class="fa-solid fa-bolt-slash"></i> Simulate Network Failure
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header">
+                <div>
+                    <h2 id="page-title">Command Center</h2>
+                    <p class="subtitle">Intelligent emergency response system</p>
+                </div>
+                <div id="mesh-mode-banner" class="hidden">
+                    <i class="fa-solid fa-satellite-dish"></i> Mesh Mode Activated (Offline Communication Active)
+                </div>
+                <div class="header-actions">
+                    <div class="time-display" id="checkout-timer">Checkout: Not Set</div>
+                    <div class="user-profile" id="user-profile-btn">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=2196f3&color=fff" alt="Admin" class="avatar">
+                        <span id="header-user-name">Admin Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content active">
+                
+                <!-- Status Row -->
+                <div class="status-grid">
+                    <div class="status-card" id="card-network">
+                        <div class="status-icon"><i class="fa-solid fa-wifi"></i></div>
+                        <div class="status-info">
+                            <h3>Network Status</h3>
+                            <p id="status-network" class="status-value success">Online</p>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-icon"><i class="fa-solid fa-bell"></i></div>
+                        <div class="status-info">
+                            <h3>Active Alerts</h3>
+                            <p id="status-alerts-count" class="status-value">0</p>
+                        </div>
+                    </div>
+                    <div class="status-card" id="card-mode">
+                        <div class="status-icon"><i class="fa-solid fa-microchip"></i></div>
+                        <div class="status-info">
+                            <h3>System Mode</h3>
+                            <p id="status-mode" class="status-value normal">Normal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <!-- Real-Time Alerts Panel -->
+                    <div class="panel alerts-panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-triangle-exclamation"></i> Active Alerts</h3>
+                            <button id="btn-add-alert" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Trigger Alert</button>
+                        </div>
+                        <div class="alerts-list" id="alerts-container">
+                            <!-- Alerts dynamically injected here -->
+                            <div class="empty-state">Loading alerts...</div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Evacuation Guidance -->
+                    <div class="panel guidance-panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-person-running"></i> Evacuation Guidance</h3>
+                        </div>
+                        <div class="guidance-content" id="guidance-container">
+                            <i class="fa-solid fa-circle-check safe-icon"></i>
+                            <p class="safe-text">All areas are currently secure. No evacuation required.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- First Responder Tab -->
+            <div id="tab-responder" class="tab-content">
+                <div class="responder-grid">
+                    <div class="panel map-panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-map-location-dot"></i> Hotel Blueprint & Hazard Zones</h3>
+                        </div>
+                        <div class="map-container relative">
+                            <!-- Generated Hotel Blueprint -->
+                            <img id="responder-map-img" src="assets/hotel_blueprint.png" alt="Hotel Blueprint Layout" class="building-map" style="filter: none; opacity: 1;">
+                            
+                            <div class="overlay-graphic" id="map-overlays">
+                                <!-- Dynamic zone markers injected here by JS -->
+                            </div>
+                        </div>
+                        <div class="map-legend">
+                            <span class="legend-item"><span class="dot fire"></span> Critical Zone</span>
+                            <span class="legend-item"><span class="dot medical"></span> Caution Zone</span>
+                            <span class="legend-item"><span class="dot route"></span> Safe Route</span>
+                        </div>
+                    </div>
+                    
+                    <div class="right-responders-column" style="display: flex; flex-direction: column; gap: 30px;">
+                        <div class="panel intel-panel">
+                            <div class="panel-header">
+                                <h3><i class="fa-solid fa-walkie-talkie"></i> Tactical Intel</h3>
+                            </div>
+                            <div class="intel-content">
+                                <div class="intel-item">
+                                    <h4>Primary Hazard</h4>
+                                    <p id="intel-hazard">None Detected</p>
+                                </div>
+                                <div class="intel-item">
+                                    <h4>Suggested Entry Point</h4>
+                                    <p id="intel-entry">Main Entrance (Lobby)</p>
+                                </div>
+                                <div class="intel-item">
+                                    <h4>Estimated Crowd Density</h4>
+                                    <p id="intel-crowd">Low (Simulation)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Stream Panel -->
+                        <div class="panel datastream-panel" style="flex: 1;">
+                            <div class="panel-header" style="justify-content: space-between;">
+                                <h3><i class="fa-solid fa-satellite"></i> Uplink to Rescue Team</h3>
+                                <span class="status-indicator live"><span class="pulse-dot"></span> LIVE</span>
+                            </div>
+                            <div class="terminal-window" id="rescue-terminal">
+                                <div class="terminal-line text-info">[SYSTEM] Establishing secure uplink with Fire Department...</div>
+                                <div class="terminal-line text-success">[SYSTEM] Handshake complete. SSL encryption active.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- User Profile / Admin Portal Drawer -->
+    <div id="profile-drawer-overlay" class="drawer-overlay hidden"></div>
+    <div id="profile-drawer" class="side-drawer">
+        <div class="drawer-header">
+            <h3><i class="fa-solid fa-id-card-clip"></i> Guest & Admin Portal</h3>
+            <button id="close-drawer" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="drawer-tabs">
+            <button class="drawer-tab active" data-dt="profile">Profile</button>
+            <button class="drawer-tab" data-dt="key">Room Key</button>
+            <button class="drawer-tab" data-dt="wifi">Wi-Fi</button>
+            <button class="drawer-tab" data-dt="rules">Policies</button>
+        </div>
+
+        <div class="drawer-content">
+            <!-- Profile Info -->
+            <div id="dt-profile" class="d-tab-pane active">
+                <div class="form-group">
+                    <label>Guest/Admin Name</label>
+                    <input type="text" class="form-input" id="guest-name" value="Admin Admin" placeholder="Enter name">
+                </div>
+                <div class="form-group">
+                    <label>Assigned Room / Zone</label>
+                    <input type="text" class="form-input" id="guest-room" value="Lobby" placeholder="e.g. 412">
+                </div>
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label>Checkout Date (11:00 AM)</label>
+                    <input type="date" class="form-input" id="checkout-date">
+                </div>
+                <button class="btn btn-primary" id="save-profile" style="width:100%">Save Details</button>
+            </div>
+
+            <!-- Digital Key -->
+            <div id="dt-key" class="d-tab-pane">
+                <div class="digital-key-card" id="digital-key">
+                    <i class="fa-brands fa-nfc-symbol"></i>
+                    <h4>Digital Access Key</h4>
+                    <p id="key-room-display">Zone: Lobby</p>
+                </div>
+                <button class="btn btn-warning" id="btn-unlock-door" style="width:100%; margin-top:20px;">
+                    <i class="fa-solid fa-unlock-keyhole"></i> Tap to Unlock Door
+                </button>
+            </div>
+
+            <!-- Wi-Fi -->
+            <div id="dt-wifi" class="d-tab-pane">
+                <div class="wifi-card">
+                    <i class="fa-solid fa-wifi" style="font-size:40px; color:var(--accent-orange); margin-bottom:15px;"></i>
+                    <h4>Hotel Secure Network</h4>
+                    <p style="color:var(--text-muted); margin-bottom: 20px;">Complimentary encrypted access</p>
+                    <button class="btn btn-primary" id="btn-connect-wifi" style="width:100%">Connect to Wi-Fi</button>
+                    <p id="wifi-status" style="margin-top:15px; font-weight:600; font-size:14px; text-align:center;"></p>
+                </div>
+            </div>
+
+            <!-- Rules -->
+            <div id="dt-rules" class="d-tab-pane">
+                <div class="rules-box">
+                    <h4>Hotel Policies & Evacuation</h4>
+                    <ul>
+                        <li><strong>No Smoking:</strong> All rooms and corridors are non-smoking.</li>
+                        <li><strong>Check-out:</strong> 11:00 AM local time.</li>
+                        <li><strong>Evacuation:</strong> Use stairs in an emergency. Do NOT use elevators. Follow lighted exit signs.</li>
+                        <li><strong>Assembly Point:</strong> Front parking lot, Section B.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Alert Modal -->
+    <div id="alert-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Trigger New Emergency Alert</h3>
+                <button id="close-modal" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="alert-form">
+                    <div class="form-group">
+                        <label>Alert Type</label>
+                        <select id="alert-type">
+                            <option value="Fire">Fire Detected</option>
+                            <option value="Medical">Medical Emergency</option>
+                            <option value="Threat">Security Threat</option>
+                            <option value="Maintenance">Maintenance Issue</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select id="alert-location">
+                            <option value="Lobby">Lobby</option>
+                            <option value="Room 302 (Sensor Alert)">Room 302</option>
+                            <option value="Floor 1 - Wing A">Floor 1 - Wing A</option>
+                            <option value="Floor 2 - Server Room">Floor 2 - Server Room</option>
+                            <option value="Floor 3 - Cafeteria">Floor 3 - Cafeteria</option>
+                            <option value="Parking Garage">Parking Garage</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="cancel-alert" class="btn">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Simulate Emergency</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
