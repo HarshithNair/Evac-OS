@@ -262,9 +262,34 @@ function setupEventListeners() {
             addNewAlert(pendingSensorAlert.type, pendingSensorAlert.location);
             logToTerminal(`[COMMAND] User approved sensor anomaly in ${pendingSensorAlert.location}. Incident elevated to Active Status.`, 'success');
             logToTerminal(`[DATA_UPLINK] Transmitting structural blueprints and active hazard overlays to Emergency Rescue Vehicle Alpha...`, 'info');
+            
+            // Dispatch to python backend for SMS notification
+            fetch('http://localhost:5000/api/notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: pendingSensorAlert.type,
+                    location: pendingSensorAlert.location
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.mode === 'mock') {
+                        logToTerminal(`[SMS SYSTEM] Rescue team alerted (MOCK MODE). SMS would be sent to +91 993093165.`, 'warning');
+                    } else {
+                        logToTerminal(`[SMS SYSTEM] Priority SMS dispatched to +91 993093165. Rescue team alerted! (SID: ${data.sid})`, 'success');
+                    }
+                } else {
+                     logToTerminal(`[SMS SYSTEM] Error dispatching SMS: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                logToTerminal(`[SMS SYSTEM] Connection to backend failed: ${error}`, 'error');
+            });
+
             pendingSensorAlert = null;
         }
-        
     });
 }
 

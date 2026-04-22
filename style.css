@@ -93,18 +93,14 @@ body {
     padding: 30px 20px;
     display: flex;
     align-items: center;
-    gap: 15px;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--accent-red);
-    white-space: nowrap;
+    justify-content: center;
+    width: 100%;
 }
 
-.logo-icon {
-    font-size: 32px;
-    background: linear-gradient(135deg, var(--accent-orange), var(--accent-red));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.logo-image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
 }
 
 .nav-menu {
