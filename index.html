@@ -45,6 +45,9 @@
                 <button class="nav-item" data-tab="responder">
                     <i class="fa-solid fa-truck-medical"></i> First Responder View
                 </button>
+                <button class="nav-item" data-tab="emergency">
+                    <i class="fa-solid fa-phone-volume"></i> Emergency Contacts
+                </button>
             </nav>
             <div class="sidebar-bottom">
                 <button id="toggle-blackout" class="btn btn-warning">
@@ -180,6 +183,68 @@
                                 <div class="terminal-line text-success">[SYSTEM] Handshake complete. SSL encryption active.</div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Contacts Tab -->
+            <div id="tab-emergency" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-address-book"></i> Emergency Directory</h3>
+                    </div>
+                    <div style="padding: 30px; display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                        
+                        <!-- External Lines -->
+                        <div style="background: var(--secondary-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h4 style="color: var(--text-main); margin-bottom: 5px; font-size: 16px;"><i class="fa-solid fa-fire-extinguisher" style="color: var(--accent-red); margin-right: 8px;"></i> Fire Station</h4>
+                                <p style="color: var(--text-muted); font-size: 14px;">External Emergency Line</p>
+                            </div>
+                            <span style="background: var(--primary-bg); color: var(--accent-red); padding: 8px 16px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 18px; border: 1px solid var(--border-color);">1800-4444-9111</span>
+                        </div>
+
+                        <div style="background: var(--secondary-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h4 style="color: var(--text-main); margin-bottom: 5px; font-size: 16px;"><i class="fa-solid fa-building-shield" style="color: var(--text-main); margin-right: 8px;"></i> Police Station</h4>
+                                <p style="color: var(--text-muted); font-size: 14px;">External Emergency Line</p>
+                            </div>
+                            <span style="background: var(--primary-bg); color: var(--text-main); padding: 8px 16px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 18px; border: 1px solid var(--border-color);">1800-5555-9112</span>
+                        </div>
+
+                        <div style="background: var(--secondary-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h4 style="color: var(--text-main); margin-bottom: 5px; font-size: 16px;"><i class="fa-solid fa-hospital" style="color: var(--safe-color); margin-right: 8px;"></i> Nearest Hospital</h4>
+                                <p style="color: var(--text-muted); font-size: 14px;">External Emergency Line</p>
+                            </div>
+                            <span style="background: var(--primary-bg); color: var(--safe-color); padding: 8px 16px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 18px; border: 1px solid var(--border-color);">1800-6666-9113</span>
+                        </div>
+
+                        <!-- Internal Lines -->
+                        <div style="background: var(--secondary-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h4 style="color: var(--text-main); margin-bottom: 5px; font-size: 16px;"><i class="fa-solid fa-bell" style="color: var(--accent-orange); margin-right: 8px;"></i> Reception</h4>
+                                <p style="color: var(--text-muted); font-size: 14px;">Internal Line</p>
+                            </div>
+                            <span style="background: var(--primary-bg); color: var(--text-main); padding: 8px 24px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 20px; border: 1px solid var(--border-color);">9</span>
+                        </div>
+
+                        <div style="background: var(--secondary-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h4 style="color: var(--text-main); margin-bottom: 5px; font-size: 16px;"><i class="fa-solid fa-headset" style="color: var(--accent-orange); margin-right: 8px;"></i> Help Desk</h4>
+                                <p style="color: var(--text-muted); font-size: 14px;">Internal Line</p>
+                            </div>
+                            <span style="background: var(--primary-bg); color: var(--text-main); padding: 8px 24px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 20px; border: 1px solid var(--border-color);">0</span>
+                        </div>
+
+                        <div style="background: var(--secondary-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h4 style="color: var(--text-main); margin-bottom: 5px; font-size: 16px;"><i class="fa-solid fa-utensils" style="color: var(--accent-orange); margin-right: 8px;"></i> Restaurant</h4>
+                                <p style="color: var(--text-muted); font-size: 14px;">Internal Line</p>
+                            </div>
+                            <span style="background: var(--primary-bg); color: var(--text-main); padding: 8px 24px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 20px; border: 1px solid var(--border-color);">7</span>
+                        </div>
+
                     </div>
                 </div>
             </div>
