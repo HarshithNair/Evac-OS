@@ -48,6 +48,9 @@
                 <button class="nav-item" data-tab="emergency">
                     <i class="fa-solid fa-phone-volume"></i> Emergency Contacts
                 </button>
+                <button class="nav-item" data-tab="policies">
+                    <i class="fa-solid fa-file-contract"></i> Policies
+                </button>
             </nav>
             <div class="sidebar-bottom">
                 <button id="toggle-blackout" class="btn btn-warning">
@@ -257,6 +260,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Policies Tab -->
+            <div id="tab-policies" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-file-contract"></i> Hotel Policies & Evacuation</h3>
+                    </div>
+                    <div class="rules-box" style="padding: 30px; font-size: 16px; line-height: 1.8;">
+                        <ul style="list-style-type: disc; margin-left: 20px;">
+                            <li style="margin-bottom: 10px;"><strong>No Smoking:</strong> All rooms and corridors are non-smoking.</li>
+                            <li style="margin-bottom: 10px;"><strong>Check-out:</strong> 11:00 AM local time.</li>
+                            <li style="margin-bottom: 10px;"><strong>Evacuation:</strong> Use stairs in an emergency. Do NOT use elevators. Follow lighted exit signs.</li>
+                            <li style="margin-bottom: 10px;"><strong>Assembly Point:</strong> Front parking lot, Section B.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             
         </main>
     </div>
@@ -273,7 +293,6 @@
             <button class="drawer-tab active" data-dt="profile">Profile</button>
             <button class="drawer-tab" data-dt="key">Room Key</button>
             <button class="drawer-tab" data-dt="wifi">Wi-Fi</button>
-            <button class="drawer-tab" data-dt="rules">Policies</button>
         </div>
 
         <div class="drawer-content">
@@ -317,18 +336,7 @@
                 </div>
             </div>
 
-            <!-- Rules -->
-            <div id="dt-rules" class="d-tab-pane">
-                <div class="rules-box">
-                    <h4>Hotel Policies & Evacuation</h4>
-                    <ul>
-                        <li><strong>No Smoking:</strong> All rooms and corridors are non-smoking.</li>
-                        <li><strong>Check-out:</strong> 11:00 AM local time.</li>
-                        <li><strong>Evacuation:</strong> Use stairs in an emergency. Do NOT use elevators. Follow lighted exit signs.</li>
-                        <li><strong>Assembly Point:</strong> Front parking lot, Section B.</li>
-                    </ul>
-                </div>
-            </div>
+
         </div>
     </div>
 
