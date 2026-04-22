@@ -1,29 +1,29 @@
 /* Color Palette & Themes */
 :root {
     /* Light Mode (Premium Warm Colors) */
-    --primary-bg: #e3f2fd;
-    --secondary-bg: #ffffff;
-    --text-main: #0d47a1;
-    --text-muted: #1565c0;
-    --accent-orange: #2196f3;
-    --accent-red: #1976d2;
-    --accent-yellow: #03a9f4;
-    --border-color: #bbdefb;
-    --shadow: 0 10px 30px rgba(216, 67, 21, 0.08);
-    --shadow-hover: 0 16px 40px rgba(216, 67, 21, 0.15);
+    --primary-bg: #FFF9C4;
+    --secondary-bg: #FFFDE7;
+    --text-main: #212121;
+    --text-muted: #616161;
+    --accent-orange: #FF9800;
+    --accent-red: #F44336;
+    --accent-yellow: #FFC107;
+    --border-color: #FFF59D;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.15);
     
     /* Semantic Colors */
-    --critical-light: #f3e5f5;
-    --critical-border: #ce93d8;
-    --critical-text: #4a148c;
+    --critical-light: #FBE9E7;
+    --critical-border: #800000;
+    --critical-text: #800000;
     
-    --high-light: #fdf5f9;
-    --high-border: #e1bee7;
-    --high-text: #8e24aa;
+    --high-light: #FFEBEE;
+    --high-border: #F44336;
+    --high-text: #D32F2F;
     
-    --medium-light: #faf7fc;
-    --medium-border: #f3e5f5;
-    --medium-text: #ba68c8;
+    --medium-light: #FFF3E0;
+    --medium-border: #FF9800;
+    --medium-text: #E65100;
     
     --safe-color: #4caf50;
     
@@ -32,13 +32,13 @@
 
 body.dark-mode {
     /* Dark / Blackout Mode */
-    --primary-bg: #0a192f;
-    --secondary-bg: #112240;
+    --primary-bg: #3E2723;
+    --secondary-bg: #4E342E;
     --text-main: #e6f1ff;
-    --text-muted: #8892b0;
-    --border-color: #233554;
+    --text-muted: #D7CCC8;
+    --border-color: #5D4037;
     --shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
-    --shadow-hover: 0 12px 40px rgba(216, 67, 21, 0.25);
+    --shadow-hover: 0 12px 40px rgba(121, 85, 72, 0.25);
     
     --critical-light: #2a0845;
     --critical-border: #ab47bc;
@@ -484,6 +484,19 @@ body {
     font-weight: 500;
 }
 
+.alert-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--border-color);
+}
+.alert-actions .btn {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
 /* Guidance Content */
 .guidance-content {
     padding: 40px;
@@ -772,11 +785,11 @@ body {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #6a1b9a;
+    background: #D32F2F;
     color: #fff;
     padding: 20px 30px;
     border-radius: 16px;
-    box-shadow: 0 15px 40px rgba(106, 27, 154, 0.4);
+    box-shadow: 0 15px 40px rgba(211, 47, 47, 0.4);
     display: flex;
     align-items: center;
     gap: 30px;
@@ -784,7 +797,7 @@ body {
     width: 600px;
     max-width: 90%;
     animation: dropDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 2px solid #ab47bc;
+    border: 2px solid #B71C1C;
 }
 .sensor-alert-container.hidden {
     display: none !important;

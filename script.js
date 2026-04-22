@@ -417,14 +417,33 @@ function renderAlerts(alertsList) {
         
         const alertEl = document.createElement('div');
         alertEl.className = `alert-item priority-${alert.priority}`;
+        alertEl.style.cursor = 'pointer';
+        
+        let statusTag = '';
+        if (alert._assigned) {
+             statusTag = '<span style="color:var(--safe-color); font-weight:bold; font-size:12px; margin-left: 10px;">(Assigned - Auto Solves in 15s)</span>';
+        }
+
         alertEl.innerHTML = `
             <div class="alert-header">
-                <span class="alert-type"><i class="fa-solid ${icon}"></i> ${alert.type}</span>
+                <span class="alert-type"><i class="fa-solid ${icon}"></i> ${alert.type} ${statusTag}</span>
                 <span class="alert-badge ${alert.priority.toLowerCase()}">${alert.priority}</span>
             </div>
             <div class="alert-location"><i class="fa-solid fa-location-dot"></i> ${alert.location}</div>
             <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;"><i class="fa-regular fa-clock"></i> Logged: ${timeStr}</div>
+            
+            <div class="alert-actions hidden" id="actions-${alert.id}">
+                <button class="btn" style="background-color: var(--accent-orange); color: white;" onclick="handleAlertAction(event, '${alert.id}', 'assigned')">Assigned</button>
+                <button class="btn btn-primary" style="background-color: var(--safe-color);" onclick="handleAlertAction(event, '${alert.id}', 'solved')">Solved</button>
+                <button class="btn btn-warning" onclick="handleAlertAction(event, '${alert.id}', 'unsolved')">Unsolved</button>
+            </div>
         `;
+
+        alertEl.addEventListener('click', () => {
+            const actDiv = document.getElementById(`actions-${alert.id}`);
+            if (actDiv) actDiv.classList.toggle('hidden');
+        });
+
         alertsContainer.appendChild(alertEl);
     });
 
@@ -521,6 +540,46 @@ function updateResponderIntel(dominantAlert) {
         intelEntry.innerText = "Primary Access (Main Lobby)";
     }
 }
+
+// --- Alert Workflow Controls ---
+function removeAlert(id) {
+    if (useLocalSim) {
+        localAlerts = localAlerts.filter(a => a.id !== id);
+        renderAlerts(localAlerts);
+    } else {
+        if (alertsRef) alertsRef.child(id).remove();
+    }
+}
+
+window.handleAlertAction = function(event, id, actionType) {
+    event.stopPropagation(); // Prevent the accordion from toggling when clicking the button
+    
+    if (actionType === 'solved') {
+        logToTerminal(`[COMMAND] Alert marked as Solved. Purging from active queue.`, 'success');
+        removeAlert(id);
+    } else if (actionType === 'assigned') {
+        logToTerminal(`[COMMAND] Responder assigned to incident. Auto-purge initiated in 15s.`, 'warning');
+        
+        document.getElementById(`actions-${id}`).classList.add('hidden');
+        
+        if (useLocalSim) {
+            const alert = localAlerts.find(a => a.id === id);
+            if(alert) alert._assigned = true;
+            renderAlerts(localAlerts);
+        } else if (alertsRef) {
+            alertsRef.child(id).update({_assigned: true});
+        }
+        
+        setTimeout(() => {
+            logToTerminal(`[SYSTEM] 15s elapsed. Assigned alert automatically resolved.`, 'info');
+            removeAlert(id);
+        }, 15000);
+        
+    } else if (actionType === 'unsolved') {
+        logToTerminal(`[COMMAND] Incident marked Unsolved. Remaining in active dashboard.`, 'error');
+        document.getElementById(`actions-${id}`).classList.add('hidden');
+    }
+};
 
 // --- Firebase Sync ---
 function setupFirebaseListeners() {
