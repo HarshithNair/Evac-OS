@@ -111,7 +111,7 @@ function init() {
     }
     
     // Auto sensor simulation
-    setInterval(triggerAutoSensor, 35000); // Trigger a sensor alert every 35 seconds
+    setInterval(triggerAutoSensor, 60000); // Trigger a sensor alert every 1 minute
 }
 
 let checkoutTimerInterval = null;
