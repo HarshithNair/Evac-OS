@@ -1,10 +1,10 @@
-# 🚨 EVAC-OS : Autonomous Crisis Response System
+#  EVAC-OS : Autonomous Crisis Response System
 
 **EVAC-OS** is a failure-resilient, intelligent emergency response platform designed for hospitality environments. It ensures seamless communication, coordination, and evacuation guidance even during worst-case scenarios where traditional systems fail.
 
 ---
 
-## 🌍 Problem Statement
+##  Problem Statement
 
 During critical emergencies, conventional systems often collapse when they are needed most:
 
@@ -16,7 +16,7 @@ This leads to delays, confusion, and increased risk to human life.
 
 ---
 
-## 💡 Solution
+##  Solution
 
 EVAC-OS is built to operate **even in complete system failure scenarios**. It leverages decentralized communication, intelligent prioritization, and real-time guidance to ensure coordinated crisis response.
 
@@ -24,32 +24,69 @@ It transforms every device into a communication node and provides actionable ins
 
 ---
 
-## 🚀 Key Features
+##  Extended Platform Features
 
-* 🔗 **Failure-Resilient Communication**
+EVAC-OS extends beyond emergency response to function as a **unified hospitality dashboard**, enhancing both operational efficiency and guest experience.
+
+###  Guest-Centric Capabilities
+
+* ** Guest Registration**
+  Enables seamless digital check-in, allowing guests to register and access services quickly
+
+* ** Digital Room Key**
+  Provides secure, app-based room access, eliminating the need for physical keys
+
+* ** Wi-Fi Access Integration**
+  Simplifies connectivity by offering instant Wi-Fi access through the platform
+
+* ** Guest Access to Safety System**
+  Guests can directly interact with EVAC-OS to:
+
+  * Receive real-time emergency alerts
+  * Access evacuation guidance
+  * Report emergencies instantly
+
+---
+
+###  Unified Experience
+
+By combining **hospitality services with crisis response**, EVAC-OS creates a single, integrated platform where:
+
+* Daily convenience meets emergency preparedness
+* Guests remain informed and connected at all times
+* Safety becomes a seamless part of the overall guest experience
+
+---
+
+**EVAC-OS transforms traditional hotel systems into a smart, connected, and safety-first ecosystem.**
+
+
+##  Key Features
+
+*  **Failure-Resilient Communication**
   Operates without internet, using simulated mesh-based communication
 
-* 📡 **Real-Time Alert System**
+*  **Real-Time Alert System**
   Displays and updates emergency alerts instantly using Firebase Realtime Database
 
-* 🧠 **Intelligent Priority Engine**
+*  **Intelligent Priority Engine**
   Automatically prioritizes emergencies based on severity
 
-* 🧭 **Dynamic Evacuation Guidance**
+*  **Dynamic Evacuation Guidance**
   Provides real-time escape instructions based on active hazards
 
-* ⚫ **Blackout Mode Simulation**
+*  **Blackout Mode Simulation**
   Demonstrates system behavior during network failure scenarios
 
-* 🛰️ **First Responder Dashboard**
+*  **First Responder Dashboard**
   Shares live hazard zones, building layout, and entry strategies
 
-* ➕ **Interactive Alert Simulation**
+*  **Interactive Alert Simulation**
   Allows users to trigger emergency scenarios for demonstration
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 * **Frontend:** HTML, CSS, JavaScript
 * **Backend:** Firebase Realtime Database
@@ -58,7 +95,7 @@ It transforms every device into a communication node and provides actionable ins
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 evac-os/
@@ -70,7 +107,7 @@ evac-os/
 
 ---
 
-## ⚙️ Setup Instructions
+##  Setup Instructions
 
 ### 1. Clone the Repository
 
@@ -117,7 +154,7 @@ Simulate a real crisis:
 
 ---
 
-## 🎯 Use Cases
+##  Use Cases
 
 * Hotels & Resorts
 * Shopping Malls
@@ -126,7 +163,7 @@ Simulate a real crisis:
 
 ---
 
-## 🏆 Innovation Highlights
+##  Innovation Highlights
 
 * Designed for **worst-case scenarios**
 * Works without reliance on centralized infrastructure
@@ -135,7 +172,7 @@ Simulate a real crisis:
 
 ---
 
-## 🔮 Future Enhancements
+##  Future Enhancements
 
 * Real Bluetooth mesh networking
 * AI-based CCTV hazard detection
