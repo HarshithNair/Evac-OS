@@ -18,6 +18,7 @@ let useLocalSim = false;
 
 // Local simulation state
 let localAlerts = [];
+let allRecords = [];
 let isBlackoutMode = false;
 let pendingSensorAlert = null;
 
@@ -54,6 +55,12 @@ const btnAddAlert = document.getElementById('btn-add-alert');
 const btnCloseModal = document.getElementById('close-modal');
 const btnCancelAlert = document.getElementById('cancel-alert');
 const alertForm = document.getElementById('alert-form');
+
+// Records References
+const recordsTableBody = document.getElementById('records-table-body');
+const btnExportPdf = document.getElementById('btn-export-pdf');
+const btnExportWord = document.getElementById('btn-export-word');
+const btnExportCsv = document.getElementById('btn-export-csv');
 
 // Drawer References
 const userProfileBtn = document.getElementById('user-profile-btn');
@@ -168,6 +175,11 @@ function setupEventListeners() {
     btnAddAlert.addEventListener('click', () => modal.classList.remove('hidden'));
     btnCloseModal.addEventListener('click', () => modal.classList.add('hidden'));
     btnCancelAlert.addEventListener('click', () => modal.classList.add('hidden'));
+    
+    // Export Behaviors
+    if (btnExportPdf) btnExportPdf.addEventListener('click', exportToPDF);
+    if (btnExportWord) btnExportWord.addEventListener('click', exportToWord);
+    if (btnExportCsv) btnExportCsv.addEventListener('click', exportToCSV);
     
     // Add Alert Form
     alertForm.addEventListener('submit', (e) => {
@@ -373,14 +385,21 @@ function addNewAlert(type, location) {
         type: type,
         location: location,
         priority: priority,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        status: 'Unsolved'
     };
 
+    if (!allRecords.find(r => r.id === newAlert.id)) {
+        allRecords.push({...newAlert});
+        renderRecordsTable();
+    }
+
     if (useLocalSim) {
-        localAlerts.push(newAlert);
+        localAlerts.push({...newAlert});
         renderAlerts(localAlerts);
     } else {
-        alertsRef.push(newAlert);
+        const { status, ...firebaseAlert } = newAlert;
+        alertsRef.push(firebaseAlert);
     }
     
     logToTerminal(`[EVENT] New alert logged: ${type} at ${location} [Priority: ${priority}]`, 'warning');
@@ -554,6 +573,15 @@ function removeAlert(id) {
 window.handleAlertAction = function(event, id, actionType) {
     event.stopPropagation(); // Prevent the accordion from toggling when clicking the button
     
+    // Update local record status
+    const rec = allRecords.find(r => r.id === id);
+    if (rec) {
+        if (actionType === 'solved') rec.status = 'Solved';
+        if (actionType === 'assigned') rec.status = 'Assigned';
+        if (actionType === 'unsolved') rec.status = 'Unsolved';
+        renderRecordsTable();
+    }
+
     if (actionType === 'solved') {
         logToTerminal(`[COMMAND] Alert marked as Solved. Purging from active queue.`, 'success');
         removeAlert(id);
@@ -572,6 +600,8 @@ window.handleAlertAction = function(event, id, actionType) {
         
         setTimeout(() => {
             logToTerminal(`[SYSTEM] 15s elapsed. Assigned alert automatically resolved.`, 'info');
+            const lateRec = allRecords.find(r => r.id === id);
+            if (lateRec) { lateRec.status = 'Solved'; renderRecordsTable(); }
             removeAlert(id);
         }, 15000);
         
@@ -590,7 +620,16 @@ function setupFirebaseListeners() {
         if (data) {
             Object.keys(data).forEach(key => {
                 alertsArray.push({ id: key, ...data[key] });
+                // Sync allRecords
+                if (!allRecords.find(r => r.id === key)) {
+                    allRecords.push({ id: key, status: (data[key]._assigned ? 'Assigned' : 'Unsolved'), ...data[key] });
+                    renderRecordsTable();
+                } else {
+                    const r = allRecords.find(r => r.id === key);
+                    if (r.status !== 'Solved') r.status = data[key]._assigned ? 'Assigned' : 'Unsolved';
+                }
             });
+            renderRecordsTable();
         }
         renderAlerts(alertsArray);
     });
@@ -610,8 +649,143 @@ function startLocalSim() {
             timestamp: Date.now() - 180000 
         }
     ];
+
+    allRecords.push({...localAlerts[0], status: 'Unsolved'});
+    renderRecordsTable();
     
     renderAlerts(localAlerts);
+}
+
+// --- Records & Exports ---
+
+function renderRecordsTable() {
+    if (!recordsTableBody) return;
+    
+    if (allRecords.length === 0) {
+        recordsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">No historical records found.</td></tr>';
+        return;
+    }
+    
+    recordsTableBody.innerHTML = '';
+    
+    // Reverse chron sort
+    const sortedRecords = [...allRecords].sort((a,b) => b.timestamp - a.timestamp);
+    
+    sortedRecords.forEach(rec => {
+        const tr = document.createElement('tr');
+        const timeStr = new Date(rec.timestamp).toLocaleString();
+        
+        let statusBadge = '';
+        if (rec.status === 'Solved') {
+            statusBadge = '<span style="color:var(--safe-color); font-weight:600;"><i class="fa-solid fa-check"></i> Solved</span>';
+        } else if (rec.status === 'Assigned') {
+            statusBadge = '<span style="color:var(--accent-orange); font-weight:600;"><i class="fa-solid fa-hourglass-half"></i> Assigned</span>';
+        } else {
+            statusBadge = '<span style="color:var(--critical-text); font-weight:600;"><i class="fa-solid fa-circle-exclamation"></i> Unsolved</span>';
+        }
+
+        tr.innerHTML = `
+            <td>${timeStr}</td>
+            <td style="font-weight:600;">${rec.type}</td>
+            <td>${rec.location}</td>
+            <td>${rec.priority}</td>
+            <td>${statusBadge}</td>
+        `;
+        recordsTableBody.appendChild(tr);
+    });
+}
+
+function exportToPDF() {
+    if (typeof window.jspdf === 'undefined' || allRecords.length === 0) return alert("Nothing to export or PDF library not loaded.");
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.text("EVAC-OS Alert Records", 14, 15);
+    
+    const tableData = [...allRecords].sort((a,b) => b.timestamp - a.timestamp).map(rec => [
+        new Date(rec.timestamp).toLocaleString(),
+        rec.type,
+        rec.location,
+        rec.priority,
+        rec.status
+    ]);
+
+    doc.autoTable({
+        head: [['Trigger Time', 'Alert Type', 'Location', 'Intensity', 'Status']],
+        body: tableData,
+        startY: 25,
+        theme: 'grid'
+    });
+
+    doc.save('evacos_records.pdf');
+}
+
+function exportToWord() {
+    if (allRecords.length === 0) return alert("Nothing to export.");
+    
+    let htmlContent = `
+    <html><head><meta charset="UTF-8"></head><body>
+    <h2>EVAC-OS Alert Records</h2>
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <tr>
+            <th>Trigger Time</th>
+            <th>Alert Type</th>
+            <th>Location</th>
+            <th>Intensity</th>
+            <th>Status</th>
+        </tr>
+    `;
+    
+    const sortedRecords = [...allRecords].sort((a,b) => b.timestamp - a.timestamp);
+    sortedRecords.forEach(rec => {
+        htmlContent += `<tr>
+            <td style="padding: 5px;">${new Date(rec.timestamp).toLocaleString()}</td>
+            <td style="padding: 5px;">${rec.type}</td>
+            <td style="padding: 5px;">${rec.location}</td>
+            <td style="padding: 5px;">${rec.priority}</td>
+            <td style="padding: 5px;">${rec.status}</td>
+        </tr>`;
+    });
+    
+    htmlContent += `</table></body></html>`;
+    
+    const blob = new Blob(['\ufeff', htmlContent], {
+        type: 'application/msword'
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'evacos_records.doc';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function exportToCSV() {
+    if (allRecords.length === 0) return alert("Nothing to export.");
+    
+    const sortedRecords = [...allRecords].sort((a,b) => b.timestamp - a.timestamp);
+    let csvContent = "Trigger Time,Alert Type,Location,Intensity,Status\n";
+    
+    sortedRecords.forEach(rec => {
+        // Handle quotes/commas in fields
+        const time = '"' + new Date(rec.timestamp).toLocaleString().replace(/"/g, '""') + '"';
+        const type = '"' + rec.type.replace(/"/g, '""') + '"';
+        const loc = '"' + rec.location.replace(/"/g, '""') + '"';
+        const prio = '"' + rec.priority.replace(/"/g, '""') + '"';
+        const stat = '"' + rec.status.replace(/"/g, '""') + '"';
+        
+        csvContent += `${time},${type},${loc},${prio},${stat}\n`;
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'evacos_records.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Boot application

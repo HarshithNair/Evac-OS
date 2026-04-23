@@ -14,6 +14,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <!-- Firebase Realtime Database -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- PDF Export Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="light-mode">
     <div id="app" class="dashboard-container">
@@ -47,6 +51,9 @@
                 </button>
                 <button class="nav-item" data-tab="emergency">
                     <i class="fa-solid fa-phone-volume"></i> Emergency Contacts
+                </button>
+                <button class="nav-item" data-tab="records">
+                    <i class="fa-solid fa-file-lines"></i> Alert Records
                 </button>
                 <button class="nav-item" data-tab="policies">
                     <i class="fa-solid fa-file-contract"></i> Policies
@@ -257,6 +264,36 @@
                             <span style="background: var(--primary-bg); color: var(--text-main); padding: 8px 24px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 20px; border: 1px solid var(--border-color);">7</span>
                         </div>
 
+                    </div>
+                </div>
+            </div>
+
+            <!-- Records Tab -->
+            <div id="tab-records" class="tab-content">
+                <div class="panel" style="min-height: auto;">
+                    <div class="panel-header" style="flex-wrap: wrap; gap: 15px;">
+                        <h3><i class="fa-solid fa-clipboard-list"></i> System Alert Records</h3>
+                        <div class="export-actions">
+                            <button class="btn btn-primary" id="btn-export-pdf" style="background-color: var(--critical-text);"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                            <button class="btn btn-primary" id="btn-export-word" style="background-color: #1976d2;"><i class="fa-solid fa-file-word"></i> Word</button>
+                            <button class="btn btn-primary" id="btn-export-csv" style="background-color: var(--safe-color);"><i class="fa-solid fa-file-csv"></i> CSV</button>
+                        </div>
+                    </div>
+                    <div class="records-container" style="padding: 20px; overflow-x: auto;">
+                        <table class="records-table" id="exportable-table">
+                            <thead>
+                                <tr>
+                                    <th>Trigger Time</th>
+                                    <th>Alert Type</th>
+                                    <th>Location</th>
+                                    <th>Intensity</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-table-body">
+                                <tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">No historical records found.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
